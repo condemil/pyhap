@@ -16,9 +16,9 @@ Requirements
 ------------
 
 * Python 3.6+
-* `cryptography <https://pypi.python.org/pypi/cryptography>`
-* `ed25519 <https://pypi.python.org/pypi/ed25519>`
-* `zeroconf <https://pypi.python.org/pypi/zeroconf>`
+* `cryptography <https://pypi.python.org/pypi/cryptography>`_
+* `ed25519 <https://pypi.python.org/pypi/ed25519>`_
+* `zeroconf <https://pypi.python.org/pypi/zeroconf>`_
 
 
 Installation
@@ -32,4 +32,4 @@ Or add pyhap to your application's `requirements.txt` / `setup.py` / `Pipfile`.
 Usage
 -----
 
-Check `examples <https://github.com/condemil/pyhap/tree/master/examples>`
+Check `examples <https://github.com/condemil/pyhap/tree/master/examples>`_
