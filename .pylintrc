@@ -1,0 +1,17 @@
+[master]
+ignore = characteristics
+
+[message control]
+disable =
+    design,
+    duplicate-code,
+    fixme,
+    invalid-name,
+    missing-docstring
+
+[reports]
+output-format = parseable
+score = no
+
+[format]
+max-line-length = 120

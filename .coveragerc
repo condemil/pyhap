@@ -1,0 +1,6 @@
+[run]
+omit =
+    pyhap/characteristics/*
+
+[report]
+show_missing = true

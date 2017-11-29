@@ -1,0 +1,18 @@
+language: python
+
+python:
+  - "3.6.3"
+
+install:
+  - pip install pytest-cov mypy coveralls
+
+script:
+  - pylint pyhap test
+  - mypy --ignore-missing-imports pyhap
+  - pytest --cov pyhap
+
+after_success:
+  - coveralls
+
+notifications:
+  email: false
