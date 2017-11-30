@@ -7,7 +7,7 @@ with open(path.join(path.dirname(__file__), 'README.rst')) as f:
 
 setup(
     name='pyhap',
-    version='0.1.0',
+    version='0.1.1',
     packages=['pyhap', 'pyhap.characteristics'],
     install_requires=[
         'cryptography',
