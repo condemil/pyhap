@@ -9,11 +9,7 @@ from pyhap.accessory import (
     Accessory,
 )
 from pyhap.characteristic import Characteristic
-from pyhap.characteristics import (
-    Brightness,
-    On,
-    Hue,
-)
+from pyhap.characteristics import On
 from pyhap.service import LightbulbService
 from pyhap.util import CustomJSONEncoder
 
@@ -93,12 +89,8 @@ class TestAccessories(TestCase):
         service = LightbulbService()
 
         bool_characteristic = On(False)
-        int_characteristic = Brightness(8)
-        float_characteristic = Hue(5.0)
 
         service.add_characteristic(bool_characteristic)
-        service.add_characteristic(int_characteristic)
-        service.add_characteristic(float_characteristic)
 
         accessories = Accessories()
         accessory.add_service(service)
@@ -115,29 +107,13 @@ class TestAccessories(TestCase):
         self.assertEqual(result, [])
         self.assertEqual(bool_characteristic.value, True)
 
-        # None value with bool format
-        self.assertEqual(bool_characteristic.value, True)
+        # None value during write, leave previous value
+        previous_value = bool_characteristic.value
         result = asyncio.get_event_loop().run_until_complete(
-            accessories.write_characteristic([{'aid': 2, 'iid': 10, 'value': None}])
+            accessories.write_characteristic([{'aid': 2, 'iid': 10}])
         )
         self.assertEqual(result, [])
-        self.assertEqual(bool_characteristic.value, False)
-
-        # None value with int format
-        self.assertEqual(int_characteristic.value, 8)
-        result = asyncio.get_event_loop().run_until_complete(
-            accessories.write_characteristic([{'aid': 2, 'iid': 11, 'value': None}])
-        )
-        self.assertEqual(result, [])
-        self.assertEqual(int_characteristic.value, 0)
-
-        # None value with float format
-        self.assertEqual(float_characteristic.value, 5.0)
-        result = asyncio.get_event_loop().run_until_complete(
-            accessories.write_characteristic([{'aid': 2, 'iid': 12, 'value': None}])
-        )
-        self.assertEqual(result, [])
-        self.assertEqual(float_characteristic.value, 0.0)
+        self.assertEqual(bool_characteristic.value, previous_value)
 
     def test_write_characteristic_read_only(self):
         accessories = Accessories()

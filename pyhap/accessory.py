@@ -167,6 +167,11 @@ class Accessories(Iterable):
         result = []
         has_errors = False
         for item in data:
+            value = item.get('value')
+
+            if value is None:
+                continue
+
             item_result = {
                 'aid': item['aid'],
                 'iid': item['iid'],
@@ -179,17 +184,8 @@ class Accessories(Iterable):
                 has_errors = True
                 continue
 
-            value = item.get('value')
             old_value = characteristic.value
-
-            if value:
-                characteristic.value = value
-            elif characteristic.characteristic_format == 'bool':  # value is None
-                characteristic.value = False
-            elif characteristic.characteristic_format == 'int':  # value is None
-                characteristic.value = 0
-            elif characteristic.characteristic_format == 'float':  # value is None
-                characteristic.value = 0.0
+            characteristic.value = value
 
             result.append(item_result)
             await self.fire_callbacks(characteristic, old_value)
