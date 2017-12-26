@@ -168,7 +168,7 @@ class Handler:
         data_length = await reader.read(ENCRYPTED_DATA_LENGTH)
 
         if not data_length:
-            raise SecurityError('Encrypted data is empty')
+            raise SecurityError('Connection closed')
 
         data_length_int = int.from_bytes(data_length, byteorder='little') + AUTH_TAG_LENGTH
 

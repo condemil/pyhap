@@ -34,15 +34,17 @@ def main():
     start(config, accessories)
 
 
-async def bulb_on(value: bool) -> None:
+async def bulb_on(value: bool) -> bool:
     if value:
         print('Bulb is on')
     else:
         print('Bulb is off')
+    return True  # non-true result indicates that the accessory is not availbale
 
 
-async def bulb_brightness(value):
+async def bulb_brightness(value) -> bool:
     print(f'Brightness is {value}%')
+    return True
 
 
 if __name__ == '__main__':

@@ -97,7 +97,7 @@ class TestAccessories(TestCase):
         accessories.add(accessory)
 
         callback = AsyncMock()
-        bool_characteristic.callbacks.append(callback)
+        bool_characteristic.callback = callback
 
         self.assertEqual(bool_characteristic.value, False)
         result = asyncio.get_event_loop().run_until_complete(
@@ -114,6 +114,25 @@ class TestAccessories(TestCase):
         )
         self.assertEqual(result, [])
         self.assertEqual(bool_characteristic.value, previous_value)
+        bool_characteristic.value = previous_value
+
+        # None callback
+        bool_characteristic.callback = None
+        result = asyncio.get_event_loop().run_until_complete(
+            accessories.write_characteristic([{'aid': 2, 'iid': 10, 'value': True}])
+        )
+        self.assertEqual(result, [])
+
+        # Exception in callback
+        bool_characteristic.callback = exception_callback
+        result = asyncio.get_event_loop().run_until_complete(
+            accessories.write_characteristic([{'aid': 2, 'iid': 10, 'value': True}])
+        )
+        self.assertEqual(result, [{
+            'aid': 2,
+            'iid': 10,
+            'status': -70402,
+        }])
 
     def test_write_characteristic_read_only(self):
         accessories = Accessories()
@@ -149,3 +168,7 @@ class TestAccessories(TestCase):
                 }]
             }]
         })
+
+
+async def exception_callback():
+    raise Exception()

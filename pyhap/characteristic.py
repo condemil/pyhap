@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from enum import Enum
 from typing import (
-    Coroutine,
+    Callable,
     Generic,
     List,
     Optional,
@@ -12,7 +12,6 @@ from uuid import UUID
 from pyhap.util import uuid_to_aduuid
 
 T = TypeVar('T', int, float, bool, str, None)
-Callback = Coroutine[T, None, None]
 
 
 class CharacteristicPermission(Enum):
@@ -23,13 +22,11 @@ class CharacteristicPermission(Enum):
 
 
 class Characteristic(Generic[T]):
-    def __init__(self, value: T = None, callback: Optional[Callback] = None) -> None:
+    def __init__(self, value: T = None, callback: Optional[Callable] = None) -> None:
         self._value: T = value
         self._accessory_id: int = None  # set by bridge
         self._instance_id: int = None  # set by bridge
-        self.callbacks: List[Callback] = []
-        if callback:
-            self.callbacks.append(callback)
+        self.callback: Callable = callback
 
     @property
     def value(self) -> T:
@@ -73,10 +70,6 @@ class Characteristic(Generic[T]):
     @instance_id.setter
     def instance_id(self, value: int):
         self._instance_id = value
-
-    async def fire_callbacks(self):
-        for callback in self.callbacks:
-            await callback(self.value)
 
     def serialize_permissions(self) -> List[str]:
         result = []

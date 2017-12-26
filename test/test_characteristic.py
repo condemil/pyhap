@@ -1,4 +1,3 @@
-from asyncio import get_event_loop
 from unittest import TestCase
 from uuid import UUID
 
@@ -37,10 +36,6 @@ class TestCharacteristic(TestCase):
         self.assertEqual(self.characteristic.instance_id, None)
         self.characteristic.instance_id = TEST_INSTANCE_ID
         self.assertEqual(self.characteristic.instance_id, TEST_INSTANCE_ID)
-
-    def test_fire_callbacks(self):
-        get_event_loop().run_until_complete(self.characteristic.fire_callbacks())
-        self.callback.assert_called_once_with(TEST_VALUE)
 
     def test_json(self):
         self.characteristic.accessory_id = TEST_ACCESSORY_ID

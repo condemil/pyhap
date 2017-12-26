@@ -176,7 +176,7 @@ class Config:
             result.append((pairing[0], bytes(bytearray.fromhex(pairing[1])), ControllerPermission(pairing[2])))
         return result
 
-    def from_dict(self, _dict: dict):
+    def from_dict(self, _dict: dict) -> None:
         self._server_port = _dict.get('server_port', 8080)
         self._device_id = _dict.get('device_id', generate_device_id())
         self._configuration_number = _dict.get('configuration_number', 1)
@@ -195,12 +195,12 @@ class Config:
         }
 
     @abstractmethod
-    def load(self):
+    def load(self) -> None:
         """Loads up config from storage"""
         raise NotImplementedError()
 
     @abstractmethod
-    def save(self):
+    def save(self) -> None:
         """Saves config to storage"""
         raise NotImplementedError()
 
@@ -212,7 +212,7 @@ class JsonConfig(Config):
         self.load()
         self.save()  # save back just after load to avoid missing values
 
-    def load(self):
+    def load(self) -> None:
         try:
             with open(self.config_filepath) as f:
                 self.from_dict(json.load(f))
@@ -221,6 +221,6 @@ class JsonConfig(Config):
         except json.JSONDecodeError:
             self.from_dict({})
 
-    def save(self):
+    def save(self) -> None:
         with open(self.config_filepath, 'w+') as f:
             json.dump(self.to_dict(), f, sort_keys=True, indent=4, cls=CustomJSONEncoder)

@@ -14,7 +14,6 @@ from pyhap.config import HAPStatusCode
 from pyhap.characteristic import (
     Characteristic,
     CharacteristicPermission,
-    T as CHARACTERISTIC_VALUE,
 )
 from pyhap.characteristics import (
     FirmwareRevision,
@@ -176,30 +175,39 @@ class Accessories(Iterable):
                 'aid': item['aid'],
                 'iid': item['iid'],
             }
-            characteristic = self.get_characteristic(item['aid'], item['iid'])
+            characteristic: Characteristic = self.get_characteristic(item['aid'], item['iid'])
 
             if CharacteristicPermission.pair_write not in characteristic.permissions:
+                logger.info('Write call to characteristic %s without write permission',
+                            characteristic.__class__.__name__)
                 item_result['status'] = HAPStatusCode.read_only.value
                 result.append(item_result)
                 has_errors = True
                 continue
 
-            old_value = characteristic.value
             characteristic.value = value
 
+            callback_result: bool = False
+
+            try:
+                logger.debug(f'Write value {value} to characteristic {characteristic.__class__.__name__}')
+                if characteristic.callback:
+                    callback_result = await characteristic.callback(characteristic.value)
+                else:
+                    callback_result = True  # do not threat missing callback as error
+            except Exception as e:  # pylint: disable=broad-except
+                logger.error(f'Callback exception: {str(e)}', exc_info=True)  # callback can throw exception, ignore it
+
+            if not callback_result:
+                item_result['status'] = HAPStatusCode.service_unavailable.value
+                has_errors = True
+
             result.append(item_result)
-            await self.fire_callbacks(characteristic, old_value)
 
         if has_errors:
             return result
 
         return []
-
-    @staticmethod
-    async def fire_callbacks(characteristic: Characteristic, old_value: CHARACTERISTIC_VALUE):
-        if characteristic.value != old_value:
-            for callback in characteristic.callbacks:
-                await callback(characteristic.value)  # type: ignore
 
     def __json__(self):
         return {
