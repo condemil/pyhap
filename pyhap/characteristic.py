@@ -86,7 +86,7 @@ class Characteristic(Generic[T]):
             'iid': self.instance_id,
         }
 
-        if self._value is not None:
+        if self._value is not None and CharacteristicPermission.pair_read in self.permissions:
             result['value'] = self._value
 
         if self.characteristic_format == 'string':
