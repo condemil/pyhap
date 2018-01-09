@@ -5,6 +5,7 @@ from typing import (
     Generic,
     List,
     Optional,
+    Type,
     TypeVar,
 )
 from uuid import UUID
@@ -34,6 +35,9 @@ class Characteristic(Generic[T]):
 
     @value.setter
     def value(self, value: T) -> None:
+        if not isinstance(value, self.characteristic_type):
+            raise ValueError(f'Failed to set value "{value}" for {self.characteristic_format} characteristic '
+                             f'{self.__class__.__name__}')
         self._value = value
 
     @property
@@ -43,7 +47,7 @@ class Characteristic(Generic[T]):
 
     @property
     @abstractmethod
-    def characteristic_type(self) -> str:
+    def characteristic_type(self) -> Type:
         raise NotImplementedError()  # pragma: no cover
 
     @property

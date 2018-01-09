@@ -9,6 +9,7 @@ TEST_ACCESSORY_ID = 5
 TEST_INSTANCE_ID = 8
 TEST_VALUE = 'test_value'
 TEST_NEW_VALUE = 'test_new_value'
+TEST_WRONG_TYPE_VALUE = 1
 TEST_CHARACTERISTIC_SHORT_UUID = '23'
 TEST_PERMISSIONS = ['pr']
 
@@ -23,6 +24,10 @@ class TestCharacteristic(TestCase):
         self.characteristic.value = TEST_NEW_VALUE
         self.assertEqual(self.characteristic.value, TEST_NEW_VALUE)
         self.characteristic.value = TEST_VALUE
+
+        with self.assertRaises(ValueError):
+            self.characteristic.value = TEST_WRONG_TYPE_VALUE
+
 
     def test_characteristic_uuid(self):
         self.assertIsInstance(self.characteristic.characteristic_uuid, UUID)

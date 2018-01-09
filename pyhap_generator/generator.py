@@ -10,17 +10,17 @@ plist_filepath = '/Applications/HomeKit Accessory Simulator.app/' \
 
 current_directory = path.dirname(path.realpath(__file__))
 characteristics_directory = path.realpath(path.join(current_directory, '..', 'pyhap', 'characteristics'))
-template_filepath = 'templates/characteristic.py.template'
+template_filepath = path.realpath(path.join(current_directory, 'templates/characteristic.py.template'))
 
 characteristic_formats = {
-    'string': 'string',
-    'bool': 'bool',
-    'uint8': 'int',
-    'uint16': 'int',
-    'uint32': 'int',
-    'int32': 'int',
-    'float': 'float',
-    'tlv8': 'tlv',
+    'string': ('str', 'string'),
+    'bool': ('bool', 'bool'),
+    'uint8': ('int', 'int'),
+    'uint16': ('int', 'int'),
+    'uint32': ('int', 'int'),
+    'int32': ('int', 'int'),
+    'float': ('float', 'float'),
+    'tlv8': ('int', 'tlv'),
 }
 
 
@@ -42,21 +42,20 @@ def main():
 
 
 def generate_characteristic(characteristic: dict) -> Tuple[Optional[str], Optional[str]]:
-    characteristic_format = characteristic_formats.get(characteristic['Format'])
-
-    if not characteristic_format:
+    if characteristic['Format'] not in characteristic_formats:
         print('Unknown characteristic format:', characteristic['Format'])
         return None, None
+
+    characteristic_type, characteristic_format = characteristic_formats[characteristic['Format']]
 
     template = open(template_filepath).read()
 
     class_name = gen_class_name(characteristic['Name'])
-    dot_name = gen_dot_name(characteristic['Name'])
     permissions = gen_permissions(characteristic['Properties'])
 
     template = template.format(
         class_name=class_name,
-        dot_name=dot_name,
+        type=characteristic_type,
         uuid=characteristic['UUID'],
         format=characteristic_format,
         permissions=permissions
@@ -73,10 +72,6 @@ def generate_characteristic(characteristic: dict) -> Tuple[Optional[str], Option
 
 def gen_class_name(name: str) -> str:
     return name.replace(' ', '')
-
-
-def gen_dot_name(name: str) -> str:
-    return name.replace(' ', '.').lower()
 
 
 def gen_underscore_name(name: str) -> str:
