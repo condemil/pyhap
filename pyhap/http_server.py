@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import (
+    AbstractEventLoop,
     StreamReader,
     StreamWriter,
 )
@@ -8,7 +9,10 @@ from email.utils import formatdate
 from functools import wraps
 from http import HTTPStatus
 from logging import getLogger
-from typing import Dict
+from typing import (
+    Dict,
+    Optional,
+)
 from urllib.parse import (
     parse_qsl,
     urlsplit,
@@ -241,7 +245,8 @@ class Handler:
 
 
 class HTTPServer:
-    def __init__(self, routes: dict) -> None:
+    def __init__(self, routes: dict, loop: Optional[AbstractEventLoop] = None) -> None:
+        self.loop = loop or asyncio.get_event_loop()
         self.routes = routes
         self.global_context: dict = {}
         self.handlers: set = set()
@@ -253,12 +258,10 @@ class HTTPServer:
         self.handlers.remove(handler)
 
     def run(self, host: str, port: int):
-        loop = asyncio.get_event_loop()
-
-        server: Server = loop.run_until_complete(asyncio.start_server(self.handler, host, port))
+        server: Server = self.loop.run_until_complete(asyncio.start_server(self.handler, host, port))
 
         try:
-            loop.run_forever()
+            self.loop.run_forever()
         except KeyboardInterrupt:
             pass
 
@@ -266,8 +269,8 @@ class HTTPServer:
             handler.close_connection = True
 
         server.close()
-        loop.run_until_complete(server.wait_closed())
-        loop.close()
+        self.loop.run_until_complete(server.wait_closed())
+        self.loop.close()
 
 
 def encrypted(func):

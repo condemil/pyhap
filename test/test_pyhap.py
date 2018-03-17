@@ -7,6 +7,7 @@ from pyhap.pyhap import (
     WebServer,
 )
 
+
 class TestPyHAP(TestCase):
     def setUp(self):
         patch_mdns_server = patch('pyhap.pyhap.MDNSServer')
@@ -20,13 +21,14 @@ class TestPyHAP(TestCase):
     def test_start(self):
         config = Mock()
         accessories = Mock()
+        loop = Mock()
 
-        pyhap.start(config, accessories)
+        pyhap.start(config, accessories, loop)
 
         self.mock_mdns_server.assert_called_once_with(config)
         self.mock_mdns_server().start.assert_called_once()
 
-        self.mock_web_server.assert_called_once_with(config, accessories)
+        self.mock_web_server.assert_called_once_with(config, accessories, loop)
         self.mock_web_server().start.assert_called_once()
 
 
