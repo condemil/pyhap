@@ -185,7 +185,12 @@ class Accessories(Iterable):
                 has_errors = True
                 continue
 
-            characteristic.value = value
+            if characteristic.characteristic_type == bool:
+                characteristic.value = bool(value)
+            elif characteristic.characteristic_type == float:
+                characteristic.value = float(value)
+            else:
+                characteristic.value = value
 
             callback_result: bool = False
 

@@ -9,7 +9,11 @@ from pyhap.accessory import (
     Accessory,
 )
 from pyhap.characteristic import Characteristic
-from pyhap.characteristics import On
+from pyhap.characteristics import (
+    Brightness,
+    On,
+    Hue,
+)
 from pyhap.service import LightbulbService
 from pyhap.util import CustomJSONEncoder
 
@@ -89,13 +93,18 @@ class TestAccessories(TestCase):
         service = LightbulbService()
 
         bool_characteristic = On(False)
+        int_characteristic = Brightness(8)
+        float_characteristic = Hue(5.0)
 
         service.add_characteristic(bool_characteristic)
+        service.add_characteristic(int_characteristic)
+        service.add_characteristic(float_characteristic)
 
         accessories = Accessories()
         accessory.add_service(service)
         accessories.add(accessory)
 
+        # bool characteristic
         callback = AsyncMock()
         bool_characteristic.callback = callback
 
@@ -106,6 +115,30 @@ class TestAccessories(TestCase):
         callback.assert_called_once_with(True)
         self.assertEqual(result, [])
         self.assertEqual(bool_characteristic.value, True)
+
+        # int characteristic write
+        callback = AsyncMock()
+        int_characteristic.callback = callback
+
+        self.assertEqual(int_characteristic.value, 8)
+        result = asyncio.get_event_loop().run_until_complete(
+            accessories.write_characteristic([{'aid': 2, 'iid': 11, 'value': 12}])
+        )
+        callback.assert_called_once_with(12)
+        self.assertEqual(result, [])
+        self.assertEqual(int_characteristic.value, 12)
+
+        # float characteristic write
+        callback = AsyncMock()
+        float_characteristic.callback = callback
+
+        self.assertEqual(float_characteristic.value, 5.0)
+        result = asyncio.get_event_loop().run_until_complete(
+            accessories.write_characteristic([{'aid': 2, 'iid': 12, 'value': 7.0}])
+        )
+        callback.assert_called_once_with(7.0)
+        self.assertEqual(result, [])
+        self.assertEqual(float_characteristic.value, 7.0)
 
         # None value during write, leave previous value
         previous_value = bool_characteristic.value
