@@ -264,7 +264,7 @@ def remove_pairing(config: Config, ios_device_pairing_id: str) -> List[dict]:
 
 
 def _error(tlv_state: TlvState, tlv_error: TlvError, reason: str) -> List[dict]:
-    logger.error(f'{tlv_state}: {tlv_error} {reason}')
+    logger.error(f'State {tlv_state} error {tlv_error}: {reason}')
     return [{
         TlvCode.state: tlv_state,
         TlvCode.error: tlv_error,
