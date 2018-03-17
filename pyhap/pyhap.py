@@ -1,7 +1,4 @@
-from asyncio import (
-    AbstractEventLoop,
-    get_event_loop,
-)
+from asyncio import AbstractEventLoop
 from logging import getLogger
 from socket import inet_aton
 from typing import Optional
