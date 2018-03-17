@@ -51,7 +51,7 @@ class Accessory:
         accessory_information = AccessoryInformationService()
 
         characteristics = (Name(name), Model(model), Manufacturer(manufacturer), SerialNumber(serial_number),
-                           FirmwareRevision(firmware_revision), Identify())
+                           FirmwareRevision(firmware_revision), Identify(False))
 
         for characteristic in characteristics:
             accessory_information.add_characteristic(characteristic)

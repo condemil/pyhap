@@ -24,6 +24,7 @@ class CharacteristicPermission(Enum):
 
 class Characteristic(Generic[T]):
     def __init__(self, value: T = None, callback: Optional[Callable] = None) -> None:
+        self._check_value(value)
         self._value: T = value
         self._accessory_id: int = None  # set by bridge
         self._instance_id: int = None  # set by bridge
@@ -35,9 +36,7 @@ class Characteristic(Generic[T]):
 
     @value.setter
     def value(self, value: T) -> None:
-        if not isinstance(value, self.characteristic_type):
-            raise ValueError(f'Failed to set value "{value}" for {self.characteristic_format} characteristic '
-                             f'{self.__class__.__name__}')
+        self._check_value(value)
         self._value = value
 
     @property
@@ -97,3 +96,8 @@ class Characteristic(Generic[T]):
             result['maxLen'] = 64
 
         return result
+
+    def _check_value(self, value: T):
+        if not isinstance(value, self.characteristic_type):
+            raise ValueError(f'Failed to set value {value} for {self.characteristic_format} characteristic '
+                             f'{self.__class__.__name__}')
